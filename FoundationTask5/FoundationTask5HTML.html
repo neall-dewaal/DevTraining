@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<h1>Fibonacci Sequence</h1>
+	<p>This page print out the Fibonacci Sequence for the Maximum number given by the user.</p>
+	<p>Please enter your maximum number and click submit</p>
+	<form action="FoundationTask5.php" method="post">
+		<p><label for="inputMaxNumber">Maximum Number</label></p>
+		<input id="inputMaxNumber" name="max" type="text"></div>
+	</form>
+	<button id="Submit" type="button">Submit</button>
+	<div id="response"></div>
+</body>
+
+<script type="text/javascript" src="assets/js/jquery-1.12.3.min.js"></script>
+<script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+	$('#Submit').click(function(){
+		var userInput = $("#inputMaxNumber");
+		$.post("FoundationTask5.php",userInput,function(data){
+			$("#response").html(data);
+		})
+	});
+</script>
+</html>
