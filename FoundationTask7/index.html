@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Basic CRUD Table</title>
+	<link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css"
+	<meta charset="utf-8">
+</head>
+<body>
+<!--Modal created by Johan Griesel addapted from Task list exercise-->
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+            </div>
+            <div class="modal-body">
+                <form action="crud.php" method="post" name="data">
+                    <div class="row">
+                            <div class="col-md-12" style="margin-bottom: 5px;;">
+                                <input id="InputPersonName" type="text" placeholder="Name" class="form-control">
+                            </div>
+                            <div class="col-md-12" style="margin-bottom: 5px;;">
+                                <input id="InputPersonSurname" type="text" placeholder="Surname" class="form-control">
+                        </div>
+                        
+                        
+                        <div class="col-md-12" style="margin-bottom: 5px;;">
+                            <input id="InputDateOfBirth" type="text" placeholder="Date of Birth" class="form-control">
+                        </div>
+                        <div class="col-md-12" style="margin-bottom: 5px;;">
+                            <input id="InputEmail" type="text" placeholder="Email" class="form-control">
+                        </div>
+                        <div class="col-md-12" style="margin-bottom: 5px;;">
+                            <input id="InputAge" type="text" placeholder="Age" class="form-control">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button id="deletePerson" type="button" class="btn btn-danger">Delete Person</button>
+                <button id="savePerson" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3">
+            
+        </div>
+        <div class="col-md-6">
+            <h2 class="page-header">DashBoard</h2>
+            <!-- Button trigger modal -->
+            <button id="createPerson" type="button" class="btn btn-primary btn-lg" style="width:100%;margin-bottom: 5px;" data-toggle="modal" data-target="#myModal">
+                Add Person
+            </button>
+            <div id="listPerson" class="list-group">
+
+            </div>
+        </div>
+        <div class="col-md-3">
+        </div>
+
+    </div>
+</div>
+<div id = "response"></div>
+</body>
+<script type="text/javascript" src="assets/js/jquery-1.12.3.min.js"></script>
+<script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+    var currentId = '';
+    $('#myModal').on('show.bs.modal', function (event) {
+        var triggerElement = $(event.relatedTarget); // Element that triggered the modal
+        var modal = $(this);
+        if (triggerElement.attr("id") == 'createPerson') {
+            modal.find('.modal-title').text('Create New Person');
+            $('#deletePerson').hide();
+            currentId = 'create';
+        } else {
+            modal.find('.modal-title').text('Details of Person');
+            //Change to show person  when clicked on.***************
+            $('#deletePerson').show();
+            currentId = triggerElement.attr("id");
+            console.log('Task ID: '+triggerElement.attr("id"));
+        }
+        if(!isNaN(currentId)) {
+
+            var DataSummary = {ID:currentId,command:'Load'};
+            $.post("crud.php",DataSummary).done(function(data){
+                var array = data.split(",");
+                $("#InputPersonName").val(array[0]);
+                $("#InputPersonSurname").val(array[1]);
+                $("#InputDateOfBirth").val(array[2]);
+                $("#InputEmail").val(array[3]);
+                $("#InputAge").val(array[4]);
+            });
+            //$("#InputPersonName").val('Neall');
+        }
+    });
+        $('#savePerson').click(function() {
+        //Get the variable input from the user from form input field.
+        var Name = $("#InputPersonName").val();
+        var Surname = $("#InputPersonSurname").val();
+        var DateOfBirth = $("#InputDateOfBirth").val();
+        var Email = $("#InputEmail").val();
+        var Age = $("#InputAge").val();
+        //Create a condition to determine if the task should be created or updated.
+        if (currentId == 'create') {
+            var command = "Create";
+        } else {
+            var command = "Update";
+        }
+        var DataSummary = {ID: currentId ,Name:Name,Surname:Surname,DateOfBirth:DateOfBirth,Email:Email,Age:Age,command:command}; //Summarize all data to be sent to update function.
+        $.post("crud.php",DataSummary,function(data){ 
+            $('#response').html(data);
+        })
+        alert('Saving Task');
+        $('#myModal').modal('hide');
+        updateDB();
+    });
+
+
+    $('#deletePerson').click(function() {
+        var DataSummary = {ID: currentId,command:'Delete'};
+        $.post("crud.php",DataSummary,function(data){
+            $('#response').html(data);  //output result to main for troubleshoot
+        })
+        //edit finish
+        alert('Deleting Task');
+        $('#myModal').modal('hide');
+        updateDB();
+    });
+	function updateDB() {
+		$.post("crud.php",function(data){
+			$('#listPerson').html(data);
+		});
+	}
+	updateDB();
+</script>
+</html>
